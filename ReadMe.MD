@@ -10,10 +10,12 @@ didn't forget to watch them.
 
 ## Existing features
 
+- GUI for interaction with user
+- Ability to create reminders
+
 ## Missing features
 
-- GUI for interaction with user
-- Process for creating, modyfying and deleting reminders
+- Process for modyfying and deleting reminders
 - Ability to select dates
 - Ability to insert webpages (example of where to watch a series)
 - Ability to run when your PC starts (may be externally prompted)
