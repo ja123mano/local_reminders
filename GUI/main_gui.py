@@ -154,6 +154,22 @@ class ReminderDisplayFrame(customtkinter.CTkFrame):
         self.repeat_label.grid(row=1, column=6, padx=10, pady=2, sticky="we")
 
 
+class WarningWindow(customtkinter.CTkToplevel):
+    def __init__(self, main_geometry: tuple, w_title = "Warning", w_width = 350, w_height = 150):
+        super().__init__()
+
+        self.title(w_title)
+        self.geometry(f"{w_width}x{w_height}")
+        self.minsize(w_width, w_height)
+        self.center(main_geometry)
+
+    def center(self, main_geometry) -> None:
+        self.update_idletasks()
+        x = (main_geometry[0] + main_geometry[2])//2
+        y = (main_geometry[1] + main_geometry[3])//2
+        self.geometry(f"+{x}+{y}")
+        
+
 class App(customtkinter.CTk):
     WIDTH: int = 1300
     HEIGHT: int = 500
@@ -183,11 +199,26 @@ class App(customtkinter.CTk):
         self.right_frame = ReminderDisplayFrame(self)
         self.right_frame.grid(row=0, column=1, rowspan=2, padx=(3,6), pady=6, sticky="nswe")
 
+    def get_geometry_info(self) -> tuple[int, int, int, int]:
+        self.update_idletasks()
+        w_geometry = self.winfo_geometry()
+        w_geometry = w_geometry.split("+")
+        temp = w_geometry[0].split("x")
+        w_geometry[0] = temp[0]
+        w_geometry.insert(1, temp[1])
+        
+        for i, info in enumerate(w_geometry):
+            w_geometry[i] = int(info)
+        
+        return tuple(w_geometry)
+
     def create_reminder(self) -> None:
         if not self.left_frame.validate_main_data():
             return None
 
         # TODO: Wrap this functionality within class so all the widgets created here are part of an object of that class
+
+        test = WarningWindow(self.get_geometry_info())
 
         reminder_data: list[str] = self.left_frame.get_reminder_data()
         name: str = reminder_data[0]
