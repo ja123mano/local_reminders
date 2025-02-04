@@ -9,8 +9,8 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         self.reminder_desc_var = tkinter.StringVar()
         self.reminder_date_var = tkinter.StringVar()
         self.reminder_link_var = tkinter.StringVar()
-        self.reminder_repeat_time_var = tkinter.IntVar(value=1)
-        self.reminder_end_repeat_time_var = tkinter.IntVar(value=1)
+        self.reminder_repeat_time_var = tkinter.StringVar()
+        self.reminder_end_repeat_time_var = tkinter.StringVar()
         self.TITLE_FONT = customtkinter.CTkFont("console", 20, "bold")
         self.SUBTITLE_FONT = customtkinter.CTkFont("console", 15, "bold")
         self.NORMAL_FONT = customtkinter.CTkFont("console", 15, "normal")
@@ -46,10 +46,10 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         self.repeat_checkbox = customtkinter.CTkCheckBox(self, text="", command=self.toggle_repeat)
         self.repeat_checkbox.grid(row=5, column=1, padx=10, pady=(50,2), sticky="we")
 
-        self.repeat_label = customtkinter.CTkLabel(self, text="Repeat every", font=self.SUBTITLE_FONT)
-        self.repeat_label.grid(row=6, column=0, padx=10, pady=2, sticky="w")
-        self.repeat_optMenu_num = customtkinter.CTkOptionMenu(self, values=[str(x) for x in range(1,8)], variable=self.reminder_repeat_time_var, state="disabled")
-        self.repeat_optMenu_num.grid(row=6, column=1, padx=10, pady=2, sticky="we")
+        self.repeat_every_label = customtkinter.CTkLabel(self, text="Repeat every", font=self.SUBTITLE_FONT)
+        self.repeat_every_label.grid(row=6, column=0, padx=10, pady=2, sticky="w")
+        self.repeat_entry_num = customtkinter.CTkEntry(self, textvariable=self.reminder_repeat_time_var, state="disabled")
+        self.repeat_entry_num.grid(row=6, column=1, padx=10, pady=2, sticky="we")
         self.repeat_time_label = customtkinter.CTkLabel(self, text="days", font=self.NORMAL_FONT)
         self.repeat_time_label.grid(row=6, column=2, padx=10, pady=2, sticky="w")
 
@@ -60,26 +60,26 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
 
         self.end_after_label = customtkinter.CTkLabel(self, text="End after", font=self.SUBTITLE_FONT)
         self.end_after_label.grid(row=8, column=0, padx=10, pady=2, sticky="w")
-        self.end_after_optMenu_num = customtkinter.CTkOptionMenu(self, values=[str(x) for x in range(1,41)], variable=self.reminder_end_repeat_time_var, state="disabled")
-        self.end_after_optMenu_num.grid(row=8, column=1, padx=10, pady=2, sticky="we")
+        self.end_after_entry_num = customtkinter.CTkEntry(self, textvariable=self.reminder_end_repeat_time_var, state="disabled")
+        self.end_after_entry_num.grid(row=8, column=1, padx=10, pady=2, sticky="we")
         self.end_after_time_label = customtkinter.CTkLabel(self, text="repetitions", font=self.NORMAL_FONT)
         self.end_after_time_label.grid(row=8, column=2, padx=10, pady=2, sticky="w")
 
     def toggle_repeat(self) -> None:
         if self.repeat_checkbox.get():
-            self.repeat_optMenu_num.configure(state="normal")
+            self.repeat_entry_num.configure(state="normal")
             self.end_repeat_checkbox.configure(state="normal")
         else:
-            self.repeat_optMenu_num.configure(state="disabled")
+            self.repeat_entry_num.configure(state="disabled")
             self.end_repeat_checkbox.configure(state="disabled")
 
         self.toggle_end_repeat()
 
     def toggle_end_repeat(self) -> None:
         if self.repeat_checkbox.get() and self.end_repeat_checkbox.get():
-            self.end_after_optMenu_num.configure(state="normal")
+            self.end_after_entry_num.configure(state="normal")
         else:
-            self.end_after_optMenu_num.configure(state="disabled")
+            self.end_after_entry_num.configure(state="disabled")
 
     def get_reminder_data(self) -> list[str]:
         data: list[str] = list()
@@ -91,31 +91,39 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         data.append(self.reminder_repeat_time_var.get())
         data.append(self.end_repeat_checkbox.get())
         data.append(self.reminder_end_repeat_time_var.get())
-        # print(data)
         return data
 
-    def validate_main_data(self) -> bool:
+    def validate_main_data(self) -> tuple[bool, str]:
         validate_flag: int = True
+        warning_msg: str = "Please set a valid:"
 
-        if self.reminder_name_var.get() == "" or self.reminder_name_var.get() == "PLEASE GIVE A NAME":
-            self.reminder_name_var.set("PLEASE GIVE A NAME")
-            self.name_entry.configure(fg_color="brown4")
+        if self.reminder_name_var.get() == "":
             validate_flag = False
-        else: self.name_entry.configure(fg_color="grey10")
+            warning_msg += "\n- Name for the reminder"
         
-        if self.reminder_desc_var.get() == "" or self.reminder_desc_var.get() == "PLEASE GIVE A DESCRIPTION":
-            self.reminder_desc_var.set("PLEASE GIVE A DESCRIPTION")
-            self.desc_entry.configure(fg_color="brown4")
+        if self.reminder_desc_var.get() == "":
             validate_flag = False
-        else: self.desc_entry.configure(fg_color="grey10")
+            warning_msg += "\n- Description for the reminder"
         
-        if self.reminder_date_var.get() == "" or self.reminder_date_var.get() == "PLEASE GIVE A DATE":
-            self.reminder_date_var.set("PLEASE GIVE A DATE")
-            self.date_entry.configure(fg_color="brown4")
+        if self.reminder_date_var.get() == "":
             validate_flag = False
-        else: self.date_entry.configure(fg_color="grey10")
+            warning_msg += "\n- Date for the reminder"
         
-        return validate_flag
+        if self.repeat_checkbox.get():
+            try:
+                int(self.reminder_repeat_time_var.get())
+            except:
+                validate_flag = False
+                warning_msg += "\n- Number of days for repetition"
+            
+            if self.end_repeat_checkbox.get():
+                try:
+                    int(self.reminder_end_repeat_time_var.get())
+                except:
+                    validate_flag = False
+                    warning_msg += "\n- Number of repetitions"
+        
+        return (validate_flag, warning_msg)
 
 
 class ReminderDisplayFrame(customtkinter.CTkFrame):
@@ -155,18 +163,25 @@ class ReminderDisplayFrame(customtkinter.CTkFrame):
 
 
 class WarningWindow(customtkinter.CTkToplevel):
-    def __init__(self, main_geometry: tuple, w_title = "Warning", w_width = 350, w_height = 150):
+    def __init__(self, main_geometry: tuple, w_title = "Warning", w_msg: str = "Something happened", w_width = 350, w_height = 150):
         super().__init__()
 
         self.title(w_title)
         self.geometry(f"{w_width}x{w_height}")
         self.minsize(w_width, w_height)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        self.w_label = customtkinter.CTkLabel(self, text=w_msg, font=customtkinter.CTkFont("console", 15, "normal"))
+        self.w_label.grid(row=0, column=0, padx=10, pady=10, sticky="nswe")
+
         self.center(main_geometry)
+        self.attributes('-topmost', True)
 
     def center(self, main_geometry) -> None:
         self.update_idletasks()
-        x = (main_geometry[0] + main_geometry[2])//2
-        y = (main_geometry[1] + main_geometry[3])//2
+        x = main_geometry[2] + main_geometry[0]//3
+        y = main_geometry[3] + main_geometry[1]//3
         self.geometry(f"+{x}+{y}")
         
 
@@ -213,12 +228,13 @@ class App(customtkinter.CTk):
         return tuple(w_geometry)
 
     def create_reminder(self) -> None:
-        if not self.left_frame.validate_main_data():
+        remind_info: tuple[bool, str] = self.left_frame.validate_main_data()
+
+        if not remind_info[0]:
+            WarningWindow(self.get_geometry_info(), "Missing information", remind_info[1])
             return None
 
         # TODO: Wrap this functionality within class so all the widgets created here are part of an object of that class
-
-        test = WarningWindow(self.get_geometry_info())
 
         reminder_data: list[str] = self.left_frame.get_reminder_data()
         name: str = reminder_data[0]
