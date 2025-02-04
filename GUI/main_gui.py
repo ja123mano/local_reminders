@@ -111,14 +111,16 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         
         if self.repeat_checkbox.get():
             try:
-                int(self.reminder_repeat_time_var.get())
+                repeat_time_int = int(self.reminder_repeat_time_var.get())
+                if repeat_time_int < 1: raise Exception
             except:
                 validate_flag = False
                 warning_msg += "\n- Number of days for repetition"
             
             if self.end_repeat_checkbox.get():
                 try:
-                    int(self.reminder_end_repeat_time_var.get())
+                    end_repeat_time_int = int(self.reminder_end_repeat_time_var.get())
+                    if end_repeat_time_int < 1: raise Exception
                 except:
                     validate_flag = False
                     warning_msg += "\n- Number of repetitions"
@@ -162,6 +164,32 @@ class ReminderDisplayFrame(customtkinter.CTkFrame):
         self.repeat_label.grid(row=1, column=6, padx=10, pady=2, sticky="we")
 
 
+class Reminder():
+    def __init__(self, reminder_data: list[str], master_frame: customtkinter.CTkFrame, text_font: customtkinter.CTkFont):
+        name: str = reminder_data[0]
+        description: str = reminder_data[1]
+        date: str = reminder_data[2]
+        link: str = reminder_data[3]
+        days: str = "NA"
+        repetitions: str = "None"
+
+        if link == "": link = "NA"
+        if reminder_data[4]:
+            days: int = f"{reminder_data[5]} day(s)"
+            if reminder_data[6]: repetitions: int = reminder_data[7]
+            else: repetitions = "Infinite"
+
+        self.select_checkbox = customtkinter.CTkCheckBox(master=master_frame, width=35, text="")
+        self.reminder_name = customtkinter.CTkLabel(master=master_frame, text=name, font=text_font)
+        self.reminder_desc = customtkinter.CTkLabel(master=master_frame, text=description, font=text_font)
+        self.reminder_link = customtkinter.CTkLabel(master=master_frame, text=link, font=text_font)
+        self.reminder_date = customtkinter.CTkLabel(master=master_frame, text=date, font=text_font)
+        self.reminder_days = customtkinter.CTkLabel(master=master_frame, text=days, font=text_font)
+        self.reminder_repetitions = customtkinter.CTkLabel(master=master_frame, text=repetitions, font=text_font)
+
+        return None
+
+
 class WarningWindow(customtkinter.CTkToplevel):
     def __init__(self, main_geometry: tuple, w_title = "Warning", w_msg: str = "Something happened", w_width = 350, w_height = 150):
         super().__init__()
@@ -183,21 +211,23 @@ class WarningWindow(customtkinter.CTkToplevel):
         x = main_geometry[2] + main_geometry[0]//3
         y = main_geometry[3] + main_geometry[1]//3
         self.geometry(f"+{x}+{y}")
-        
+
 
 class App(customtkinter.CTk):
     WIDTH: int = 1300
     HEIGHT: int = 500
     RIGHT_FRAME_HEADERS: int = 2
-    REMINDERS: int = 0 + RIGHT_FRAME_HEADERS
+    REM_ROWS: int = 0 + RIGHT_FRAME_HEADERS
+    REM_ID: int = 0
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
 
         self.title("Reminders")
         self.geometry(f"{App.WIDTH}x{App.HEIGHT}")
 
         self.NORMAL_FONT = customtkinter.CTkFont("console", 15, "normal")
+        self.CREATED_REMINDERS = dict()
 
         # =================================== Frames ===================================
 
@@ -234,45 +264,25 @@ class App(customtkinter.CTk):
             WarningWindow(self.get_geometry_info(), "Missing information", remind_info[1])
             return None
 
-        # TODO: Wrap this functionality within class so all the widgets created here are part of an object of that class
-
         reminder_data: list[str] = self.left_frame.get_reminder_data()
-        name: str = reminder_data[0]
-        description: str = reminder_data[1]
-        date: str = reminder_data[2]
-        link: str = reminder_data[3]
-        days: str = "NA"
-        repetitions: str = "None"
+        self.CREATED_REMINDERS[App.REM_ID] = Reminder(reminder_data, self.right_frame, self.NORMAL_FONT)
+        App.REM_ID += 1
 
-        if link == "": link = "NA"
-        if reminder_data[4]:
-            days: int = f"{reminder_data[5]} day(s)"
-            if reminder_data[6]: repetitions: int = reminder_data[7]
-            else: repetitions = "Infinite"
+        for i in range(len(self.CREATED_REMINDERS)):
+            reminder = self.CREATED_REMINDERS[i]
 
-        self.select_checkbox = customtkinter.CTkCheckBox(self.right_frame, width=35, text="")
-        self.select_checkbox.grid(row=App.REMINDERS, column=0, padx=10, sticky="e")
-
-        self.reminder_name = customtkinter.CTkLabel(self.right_frame, text=name, font=self.NORMAL_FONT)
-        self.reminder_name.grid(row=App.REMINDERS, column=1, sticky="we")
-
-        self.reminder_desc = customtkinter.CTkLabel(self.right_frame, text=description, font=self.NORMAL_FONT)
-        self.reminder_desc.grid(row=App.REMINDERS, column=2, sticky="we")
-
-        self.reminder_link = customtkinter.CTkLabel(self.right_frame, text=link, font=self.NORMAL_FONT)
-        self.reminder_link.grid(row=App.REMINDERS, column=3, sticky="we")
-
-        self.reminder_date = customtkinter.CTkLabel(self.right_frame, text=date, font=self.NORMAL_FONT)
-        self.reminder_date.grid(row=App.REMINDERS, column=4, sticky="we")
-
-        self.reminder_days = customtkinter.CTkLabel(self.right_frame, text=days, font=self.NORMAL_FONT)
-        self.reminder_days.grid(row=App.REMINDERS, column=5, sticky="we")
-
-        self.reminder_repetitions = customtkinter.CTkLabel(self.right_frame, text=repetitions, font=self.NORMAL_FONT)
-        self.reminder_repetitions.grid(row=App.REMINDERS, column=6, sticky="we")
-
-        App.REMINDERS += 1
+            reminder.select_checkbox.grid(row=App.REM_ROWS+i, column=0, padx=10, sticky="e")
+            reminder.reminder_name.grid(row=App.REM_ROWS+i, column=1, sticky="we")
+            reminder.reminder_desc.grid(row=App.REM_ROWS+i, column=2, sticky="we")
+            reminder.reminder_link.grid(row=App.REM_ROWS+i, column=3, sticky="we")
+            reminder.reminder_date.grid(row=App.REM_ROWS+i, column=4, sticky="we")
+            reminder.reminder_days.grid(row=App.REM_ROWS+i, column=5, sticky="we")
+            reminder.reminder_repetitions.grid(row=App.REM_ROWS+i, column=6, sticky="we")
+        
+        App.REM_ROWS += 1
+        print(self.CREATED_REMINDERS)
         return None
+
 
 if __name__ == "__main__":
     new_window: App = App()
