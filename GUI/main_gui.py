@@ -2,8 +2,48 @@ import customtkinter
 import tkinter
 
 class ReminderInfoFrame(customtkinter.CTkFrame):
+    """
+    Class inheriting functionality from the CTkFrame widget from customtkinter.
+    
+    Encapsulates the ability to enter the reminder information and important
+    functions to retrieve the correct information for the reminder.
+
+    Attributes
+    ----------
+    reminder_name_var (tkinter.StringVar): Name of the reminder.
+    reminder_desc_var (tkinter.StringVar): Description of the reminder.
+    reminder_date_var (tkinter.StringVar): Date of the reminder.
+    reminder_link_var (tkinter.StringVar): Link of the reminder.
+    reminder_repeat_time_var (tkinter.StringVar): Days to wait to repeat the reminder. 
+    reminder_end_repeat_time_var (tkinter.StringVar): Limit of repetitions of the reminder.
+    TITLE_FONT (customtkinter_CTkFont): Font used in the object's title.
+    SUBTITLE_FONT (customtkinter_CTkFont): Font used in the object's subtitles.
+    NORMAL_FONT (customtkinter_CTkFont): Font used in the object's label spaces.
+
+    The rest of the attributes are customtkinter widgets used for the user to enter
+    the reminder information accordingly.
+    """
+
     def __init__(self, master, corner_radius = 8):
+        """
+        Initializes the frame object. This is only called once at the start of the program
+        to display the frame the user will be using to enter the reminder information.
+
+        Parameters
+        ----------
+        master : customtkinter.CTk
+            Tells the object who the parent window will be (in this case, the main window)
+            so the object displays in the correct place.
+        corner_radius : int = 8
+            Used to round the frame's corners. A higher number means the corners will be
+            rounder. A smaller number means the corners will be squarer.
+        """
+
+        # ===================================  ===================================
+
         super().__init__(master, corner_radius=corner_radius)
+
+        # =================================== Object variables ===================================
 
         self.reminder_name_var = tkinter.StringVar()
         self.reminder_desc_var = tkinter.StringVar()
@@ -14,6 +54,8 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         self.TITLE_FONT = customtkinter.CTkFont("console", 20, "bold")
         self.SUBTITLE_FONT = customtkinter.CTkFont("console", 15, "bold")
         self.NORMAL_FONT = customtkinter.CTkFont("console", 15, "normal")
+
+        # =================================== Object widgets ===================================
 
         self.grid_columnconfigure(2, weight=1)
         self.grid_rowconfigure(9, weight=1)
@@ -66,6 +108,11 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         self.end_after_time_label.grid(row=8, column=2, padx=10, pady=2, sticky="w")
 
     def toggle_repeat(self) -> None:
+        """
+        Called every time the user clics the 'Repeat?' checkbox to
+        enable or disable the repeat/end repeat options of the reminder.
+        """
+
         if self.repeat_checkbox.get():
             self.repeat_entry_num.configure(state="normal")
             self.end_repeat_checkbox.configure(state="normal")
@@ -76,12 +123,27 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         self.toggle_end_repeat()
 
     def toggle_end_repeat(self) -> None:
+        """
+        Called every time the toggle_repeat function is called or
+        the 'end repeat' checkbox is clicked. Used to enable/disable the
+        end repeat option of the reminder.
+        """
+
         if self.repeat_checkbox.get() and self.end_repeat_checkbox.get():
             self.end_after_entry_num.configure(state="normal")
         else:
             self.end_after_entry_num.configure(state="disabled")
 
     def get_reminder_data(self) -> list[str]:
+        """
+        Returns a list of the information of the reminder.
+
+        Returns
+        -------
+        list[str]
+            A list containing the information of the reminder.
+        """
+        
         data: list[str] = list()
         data.append(self.reminder_name_var.get())
         data.append(self.reminder_desc_var.get())
@@ -94,6 +156,21 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         return data
 
     def validate_main_data(self) -> tuple[bool, str]:
+        """
+        Validates that the reminder information entered by the user
+        is correct.
+
+        Returns
+        -------
+        tuple[bool, str]
+            Tuple containing a flag [0] wheter the information is correct or not
+            and a string [1] that contains a message of the incorrect information
+            entered by the user. 
+            
+            The string is meant to be displayed by an object of type WarningWindow,
+            using the string as the w_msg attribute of the object initializacion call.
+        """
+
         validate_flag: int = True
         warning_msg: str = "Please set a valid:"
 
