@@ -16,9 +16,9 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
     reminder_link_var (tkinter.StringVar): Link of the reminder.
     reminder_repeat_time_var (tkinter.StringVar): Days to wait to repeat the reminder. 
     reminder_end_repeat_time_var (tkinter.StringVar): Limit of repetitions of the reminder.
-    TITLE_FONT (customtkinter_CTkFont): Font used in the object's title.
-    SUBTITLE_FONT (customtkinter_CTkFont): Font used in the object's subtitles.
-    NORMAL_FONT (customtkinter_CTkFont): Font used in the object's label spaces.
+    TITLE_FONT (customtkinter.CTkFont): Font used in the object's title.
+    SUBTITLE_FONT (customtkinter.CTkFont): Font used in the object's subtitles.
+    NORMAL_FONT (customtkinter.CTkFont): Font used in the object's label spaces.
 
     The rest of the attributes are customtkinter widgets used for the user to enter
     the reminder information accordingly.
@@ -26,7 +26,7 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
 
     def __init__(self, master, corner_radius = 8):
         """
-        Initializes the frame object. This is only called once at the start of the program
+        Initializes a frame object. This is only called once at the start of the program
         to display the frame the user will be using to enter the reminder information.
 
         Parameters
@@ -39,7 +39,7 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
             rounder. A smaller number means the corners will be squarer.
         """
 
-        # ===================================  ===================================
+        # =================================== Super class call ===================================
 
         super().__init__(master, corner_radius=corner_radius)
 
@@ -206,12 +206,48 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
 
 
 class ReminderDisplayFrame(customtkinter.CTkFrame):
+    """
+    Class inheriting functionality from the CTkFrame widget from customtkinter.
+    
+    This class is used to display the created reminders.
+
+    Attributes
+    ----------
+    TITLE_FONT (customtkinter.CTkFont): Font used in the object's title.
+    SUBTITLE_FONT (customtkinter.CTkFont): Font used in the object's subtitles.
+    NORMAL_FONT (customtkinter.CTkFont): Font used in the object's label spaces.
+
+    The rest of the attributes are customtkinter widgets used for the user to enter
+    the reminder information accordingly.
+    """
+    
     def __init__(self, master, corner_radius = 8):
+        """
+        Initializes a frame object. This is only called once at the start of the program
+        to place a frame where the reminders will be displayed for the user to see with
+        the information they entered.
+
+        Parameters
+        ----------
+        master : customtkinter.CTk
+            Tells the object who the parent window will be (in this case, the main window)
+            so the object displays in the correct place.
+        corner_radius : int = 8
+            Used to round the frame's corners. A higher number means the corners will be
+            rounder. A smaller number means the corners will be squarer.
+        """
+        
+        # =================================== Super class call ===================================
+
         super().__init__(master,corner_radius=corner_radius)
+
+        # =================================== Object variables ===================================
 
         self.TITLE_FONT = customtkinter.CTkFont("console", 20, "bold")
         self.SUBTITLE_FONT = customtkinter.CTkFont("console", 15, "bold")
         self.NORMAL_FONT = customtkinter.CTkFont("console", 15, "normal")
+
+        # =================================== Object widgets ===================================
 
         self.grid_columnconfigure((1,2,3,4), weight=1)
         self.grid_columnconfigure((1,2,3,4,5,6), minsize=100)
@@ -242,13 +278,39 @@ class ReminderDisplayFrame(customtkinter.CTkFrame):
 
 
 class Reminder():
-    def __init__(self, reminder_data: list[str], master_frame: customtkinter.CTkFrame, text_font: customtkinter.CTkFont):
+    """
+    This class represents a reminder, with the data the user entered in the
+    ReminderInfoFrame object. This class helps encapsulate the data needed for the
+    reminder to exist.
+
+    Attributes
+    ----------
+    All the attributes of the class are customtkinter widgets, filled with the
+    information obtained from the ReminderInfoFrame object.
+    """
+
+    def __init__(self, reminder_data: list[str], master_frame: customtkinter.CTkFrame) -> None:
+        """
+        Initializes a reminder object. This object will contain all the info
+        that the ReminderInfoFrame object has when pressing the 'Create reminder'
+        button in the main window.
+
+        Parameters
+        ----------
+        reminder_data : list[str]
+            A list with the reminder info at the moment the Reminder object is
+            created.
+        master_frame: customtkinter.CTkFrame
+            The parent object where this Reminder object will be displayed.
+        """
+
         name: str = reminder_data[0]
         description: str = reminder_data[1]
         date: str = reminder_data[2]
         link: str = reminder_data[3]
         days: str = "NA"
         repetitions: str = "None"
+        text_font: customtkinter.CTkFont = customtkinter.CTkFont("console", 15, "normal")
 
         if link == "": link = "NA"
         if reminder_data[4]:
@@ -268,8 +330,44 @@ class Reminder():
 
 
 class WarningWindow(customtkinter.CTkToplevel):
-    def __init__(self, main_geometry: tuple, w_title = "Warning", w_msg: str = "Something happened", w_width = 350, w_height = 150):
+    """
+    Class inheriting functionality from the CTkTopLevel widget from customtkinter.
+    
+    This class is used to display a variety of warning messages.
+
+    Attributes
+    ----------
+    All the attributes of the class are attributes of the super class and a level
+    widget to display the warning message.
+    """
+
+    def __init__(self, main_geometry: tuple[int, int, int, int], w_title: str = "Warning", w_msg: str = "Something happened", w_width: int = 350, w_height: int = 150):
+        """
+        Initializes a top level object used to display a message when something happens.
+        This is the way the main window communicates with the user when something needs
+        his attention.
+
+        Parameters
+        ----------
+        main_geometry : tuple[int, int, int, int]
+            Tuple that contains the geometry dimensions and displacement of the main
+            window. This information is used to display the warning window near the
+            center of the main window.
+        w_title : str = "Warning"
+            The title of the warning window.
+        w_msg : str = "Something happened"
+            The message the warning window will display.
+        w_width : int = 350
+            The width of the warning window.
+        w_height : int = 150
+            The height of the warning window.
+        """
+
+        # =================================== Super class call ===================================
+
         super().__init__()
+
+        # =================================== Object configuration ===================================
 
         self.title(w_title)
         self.geometry(f"{w_width}x{w_height}")
@@ -283,7 +381,18 @@ class WarningWindow(customtkinter.CTkToplevel):
         self.center(main_geometry)
         self.attributes('-topmost', True)
 
-    def center(self, main_geometry) -> None:
+    def center(self, main_geometry: tuple[int, int, int, int]) -> None:
+        """
+        Function used to center the warning window within the main window.
+        This is done so the warning message does not goes unoticed.
+
+        Parameters
+        ----------
+        main_geometry : tuple[int, int, int, int]
+            Tuple that contains the geometry dimensions and displacement of the main
+            window.
+        """
+
         self.update_idletasks()
         x = main_geometry[2] + main_geometry[0]//3
         y = main_geometry[3] + main_geometry[1]//3
@@ -342,7 +451,7 @@ class App(customtkinter.CTk):
             return None
 
         reminder_data: list[str] = self.left_frame.get_reminder_data()
-        self.CREATED_REMINDERS[App.REM_ID] = Reminder(reminder_data, self.right_frame, self.NORMAL_FONT)
+        self.CREATED_REMINDERS[App.REM_ID] = Reminder(reminder_data, self.right_frame)
         App.REM_ID += 1
 
         for i in range(len(self.CREATED_REMINDERS)):
