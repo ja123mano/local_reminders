@@ -1,5 +1,8 @@
 import customtkinter
 import tkinter
+import pathlib
+import tkcalendar
+from playsound import playsound
 
 class ReminderInfoFrame(customtkinter.CTkFrame):
     """
@@ -75,8 +78,8 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
 
         self.date_label = customtkinter.CTkLabel(self, text="Date", font=self.SUBTITLE_FONT)
         self.date_label.grid(row=3, column=0, padx=10, pady=2, sticky="w")
-        self.date_entry = customtkinter.CTkEntry(self, textvariable=self.reminder_date_var, fg_color="grey10")
-        self.date_entry.grid(row=3, column=1, columnspan=2, padx=10, pady=2, sticky="we")
+        self.date_dateEntry = tkcalendar.DateEntry(self, background="midnight blue", foreground="white", borderwidth=2)
+        self.date_dateEntry.grid(row=3, column=1, columnspan=2, padx=10, pady=2, sticky="we")
 
         self.link_label = customtkinter.CTkLabel(self, text="Link", font=self.SUBTITLE_FONT)
         self.link_label.grid(row=4, column=0, padx=10, pady=2, sticky="w")
@@ -134,6 +137,14 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         else:
             self.end_after_entry_num.configure(state="disabled")
 
+    def get_date(self) -> None:
+        """
+        Grabs the date from the Date Entry widget and sets it into the
+        reminder_date_var variable 
+        """
+
+        self.reminder_date_var.set(self.date_dateEntry.get_date())
+
     def get_reminder_data(self) -> list[str]:
         """
         Returns a list of the information of the reminder.
@@ -143,7 +154,7 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
         list[str]
             A list containing the information of the reminder.
         """
-        
+
         data: list[str] = list()
         data.append(self.reminder_name_var.get())
         data.append(self.reminder_desc_var.get())
@@ -182,6 +193,7 @@ class ReminderInfoFrame(customtkinter.CTkFrame):
             validate_flag = False
             warning_msg += "\n- Description for the reminder"
         
+        self.get_date()
         if self.reminder_date_var.get() == "":
             validate_flag = False
             warning_msg += "\n- Date for the reminder"
@@ -341,7 +353,7 @@ class WarningWindow(customtkinter.CTkToplevel):
     widget to display the warning message.
     """
 
-    def __init__(self, main_geometry: tuple[int, int, int, int], w_title: str = "Warning", w_msg: str = "Something happened", w_width: int = 350, w_height: int = 150):
+    def __init__(self, main_geometry: tuple[int, int, int, int], w_title: str = "Warning", w_msg: str = "Something happened", w_width: int = 350, w_height: int = 150, sound: pathlib.Path = None):
         """
         Initializes a top level object used to display a message when something happens.
         This is the way the main window communicates with the user when something needs
@@ -380,6 +392,7 @@ class WarningWindow(customtkinter.CTkToplevel):
 
         self.center(main_geometry)
         self.attributes('-topmost', True)
+        if sound: playsound(sound, False)
 
     def center(self, main_geometry: tuple[int, int, int, int]) -> None:
         """
@@ -405,6 +418,7 @@ class App(customtkinter.CTk):
     RIGHT_FRAME_HEADERS: int = 2
     REM_ROWS: int = 0 + RIGHT_FRAME_HEADERS
     REM_ID: int = 0
+    SOUNDS_FOLDER: pathlib.Path = pathlib.Path.joinpath(pathlib.Path.cwd(), "Sounds")
 
     def __init__(self) -> None:
         super().__init__()
@@ -447,7 +461,8 @@ class App(customtkinter.CTk):
         remind_info: tuple[bool, str] = self.left_frame.validate_main_data()
 
         if not remind_info[0]:
-            WarningWindow(self.get_geometry_info(), "Missing information", remind_info[1])
+            warning_sound: str = str(pathlib.Path.joinpath(App.SOUNDS_FOLDER, r"Warning_window.mp3"))
+            WarningWindow(self.get_geometry_info(), "Missing information", remind_info[1], sound=warning_sound)
             return None
 
         reminder_data: list[str] = self.left_frame.get_reminder_data()
@@ -466,7 +481,7 @@ class App(customtkinter.CTk):
             reminder.reminder_repetitions.grid(row=App.REM_ROWS+i, column=6, sticky="we")
         
         App.REM_ROWS += 1
-        print(self.CREATED_REMINDERS)
+        # print(self.CREATED_REMINDERS)
         return None
 
 
