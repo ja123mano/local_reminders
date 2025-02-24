@@ -10,10 +10,10 @@ Create, modify and edit reminders inside you local PC. This is a beginner projec
 
 - GUI for interaction with user
 - Ability to create and display reminders
+- Ability to select dates
 - Validation of the reminder information
 
 ## Missing features
 
 - Process for modyfying and deleting reminders
-- Ability to select dates
 - Ability to run when your PC starts (may be externally prompted)
