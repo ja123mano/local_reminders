@@ -15,5 +15,6 @@ Create, modify and edit reminders inside you local PC. This is a beginner projec
 
 ## Missing features
 
+- Process for saving reminders
 - Process for modyfying and deleting reminders
 - Ability to run when your PC starts (may be externally prompted)

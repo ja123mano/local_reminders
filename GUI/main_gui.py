@@ -12,7 +12,6 @@ class App(customtkinter.CTk):
     WIDTH: int = 1300
     HEIGHT: int = 500
     RIGHT_FRAME_HEADERS: int = 2
-    REM_ROWS: int = 0 + RIGHT_FRAME_HEADERS
     REM_ID: int = 0
     SOUNDS_FOLDER: pathlib.Path = pathlib.Path.joinpath(pathlib.Path.cwd(), "Sounds")
 
@@ -65,13 +64,13 @@ class App(customtkinter.CTk):
         self.CREATED_REMINDERS[App.REM_ID] = Reminder(reminder_data, self.right_frame)
 
         reminder = self.CREATED_REMINDERS[App.REM_ID]
-        reminder.select_checkbox.grid(row=App.REM_ROWS+App.REM_ID+1, column=0, padx=10, sticky="e")
-        reminder.reminder_name.grid(row=App.REM_ROWS+App.REM_ID+1, column=1, sticky="we")
-        reminder.reminder_desc.grid(row=App.REM_ROWS+App.REM_ID+1, column=2, sticky="we")
-        reminder.reminder_link.grid(row=App.REM_ROWS+App.REM_ID+1, column=3, sticky="we")
-        reminder.reminder_date.grid(row=App.REM_ROWS+App.REM_ID+1, column=4, sticky="we")
-        reminder.reminder_days.grid(row=App.REM_ROWS+App.REM_ID+1, column=5, sticky="we")
-        reminder.reminder_repetitions.grid(row=App.REM_ROWS+App.REM_ID+1, column=6, sticky="we")
+        reminder.select_checkbox.grid(row=App.RIGHT_FRAME_HEADERS+App.REM_ID+1, column=0, padx=10, sticky="e")
+        reminder.reminder_name.grid(row=App.RIGHT_FRAME_HEADERS+App.REM_ID+1, column=1, sticky="we")
+        reminder.reminder_desc.grid(row=App.RIGHT_FRAME_HEADERS+App.REM_ID+1, column=2, sticky="we")
+        reminder.reminder_link.grid(row=App.RIGHT_FRAME_HEADERS+App.REM_ID+1, column=3, sticky="we")
+        reminder.reminder_date.grid(row=App.RIGHT_FRAME_HEADERS+App.REM_ID+1, column=4, sticky="we")
+        reminder.reminder_days.grid(row=App.RIGHT_FRAME_HEADERS+App.REM_ID+1, column=5, sticky="we")
+        reminder.reminder_repetitions.grid(row=App.RIGHT_FRAME_HEADERS+App.REM_ID+1, column=6, sticky="we")
         
         App.REM_ID += 1
         return None
