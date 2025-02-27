@@ -28,26 +28,41 @@ class Reminder():
             The parent object where this Reminder object will be displayed.
         """
 
-        name: str = reminder_data[0]
-        description: str = reminder_data[1]
-        date: str = reminder_data[2]
-        link: str = reminder_data[3]
-        days: str = "NA"
-        repetitions: str = "None"
+        self.name: str = reminder_data[0]
+        self.description: str = reminder_data[1]
+        self.date: str = reminder_data[2]
+        self.link: str = reminder_data[3]
+        self.days: str = "NA"
+        self.repetitions: str = "None"
         text_font: customtkinter.CTkFont = customtkinter.CTkFont("console", 15, "normal")
 
-        if link == "": link = "NA"
+        if self.link == "": self.link = "NA"
         if reminder_data[4]:
-            days = f"{reminder_data[5]} day(s)"
-            if reminder_data[6]: repetitions = str(reminder_data[7])
-            else: repetitions = "Infinite"
+            self.days = f"{reminder_data[5]} day(s)"
+            if reminder_data[6]: self.repetitions = str(reminder_data[7])
+            else: self.repetitions = "Infinite"
 
         self.select_checkbox = customtkinter.CTkCheckBox(master=master_frame, width=35, text="")
-        self.reminder_name = customtkinter.CTkLabel(master=master_frame, text=name, font=text_font)
-        self.reminder_desc = customtkinter.CTkLabel(master=master_frame, text=description, font=text_font)
-        self.reminder_link = customtkinter.CTkLabel(master=master_frame, text=link, font=text_font)
-        self.reminder_date = customtkinter.CTkLabel(master=master_frame, text=date, font=text_font)
-        self.reminder_days = customtkinter.CTkLabel(master=master_frame, text=days, font=text_font)
-        self.reminder_repetitions = customtkinter.CTkLabel(master=master_frame, text=repetitions, font=text_font)
+        self.reminder_name = customtkinter.CTkLabel(master=master_frame, text=self.name, font=text_font)
+        self.reminder_desc = customtkinter.CTkLabel(master=master_frame, text=self.description, font=text_font)
+        self.reminder_link = customtkinter.CTkLabel(master=master_frame, text=self.link, font=text_font)
+        self.reminder_date = customtkinter.CTkLabel(master=master_frame, text=self.date, font=text_font)
+        self.reminder_days = customtkinter.CTkLabel(master=master_frame, text=self.days, font=text_font)
+        self.reminder_repetitions = customtkinter.CTkLabel(master=master_frame, text=self.repetitions, font=text_font)
 
         return None
+    
+    def get_reminder_details(self) -> dict[str]:
+        # TODO Update documentations for the function and the class
+
+        reminder_details: dict[str] = dict()
+
+        reminder_details["checkbox"] = self.select_checkbox.get()
+        reminder_details["name"] = self.name
+        reminder_details["description"] = self.description
+        reminder_details["date"] = self.date
+        reminder_details["link"] = self.link
+        reminder_details["days"] = self.days
+        reminder_details["reps"] = self.repetitions
+        
+        return reminder_details

@@ -12,9 +12,10 @@ Create, modify and edit reminders inside you local PC. This is a beginner projec
 - Ability to create and display reminders
 - Ability to select dates
 - Validation of the reminder information
+- Process for saving reminders with pickle lib
 
 ## Missing features
 
-- Process for saving reminders
+- Process for saving reminders with json lib
 - Process for modyfying and deleting reminders
 - Ability to run when your PC starts (may be externally prompted)
